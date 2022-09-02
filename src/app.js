@@ -4,6 +4,8 @@ const cookieParser = require("cookie-parser")
 
 const Student = require("./models/student")
 const res = require("express/lib/response")
+const upload =require("./middleware/upload")
+
 
 const app = express()
 app.use(express.json());
@@ -17,9 +19,19 @@ app.get("/", (req,res)=>{
     res.status(201).send("Welcome to Home Page")
 })
 
-app.post("/register", async(req,res)=>{
+app.post("/register",upload.single('image'), async(req,res)=>{
     try {
-        const newStudent = new Student(req.body)
+
+       const newStudent = new Student({
+            name: req.body.name,
+            email: req.body.email,
+            age:req.body.age,
+            city:req.body.city,
+            state:req.body.state,
+            country:req.body.country,
+            image:req.file.path,
+            password: req.body.password,
+        })
         const registered = await newStudent.save()
 
         const token = await registered.generateAuthToken();
@@ -30,7 +42,7 @@ app.post("/register", async(req,res)=>{
             httpOnly: true
         })
 
-        // console.log(registered);
+        console.log(registered);
         res.status(201).send(registered)
     } catch (error) {
         res.status(400).send(error)
@@ -42,8 +54,9 @@ app.post("/register", async(req,res)=>{
 app.post("/login", async (req,res)=>{
     try {
         // const detail = req.body;
-        const verifyUser = await Student.findOne({email: req.body.email})
-
+        const verifyUser = await Student.find({email: req.body.email})
+        console.log(verifyUser);
+        // console.log(req.body.email);
         const token = await verifyUser.generateAuthToken();
         // console.log("the token part " + token)
         
@@ -63,6 +76,11 @@ app.post("/login", async (req,res)=>{
         res.send(error)
     }
 })
+
+// app.post("/single", upload.single("singleImage"), (req, res) => {
+//     console.log(req.file);
+//     res.status(201).send("Upload Successful")
+// })
 
 app.listen(port,()=>{
     console.log("Server is started");

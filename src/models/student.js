@@ -27,6 +27,10 @@ const studentSchema = new mongoose.Schema({
         type : String,
         required :true
     },
+    image:{
+        type:String,
+        required:true
+    },
     password: {
         type: String,
         required: true
@@ -50,7 +54,7 @@ studentSchema.methods.generateAuthToken = async function () {
         return token
     } catch (error) {
         res.send("the error part" + error);
-        console.log("the error part " + error);
+        // console.log("the error part " + error);
     }
 }
 
