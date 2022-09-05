@@ -1,6 +1,7 @@
 const express = require("express")
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
+const bcrypt = require("bcrypt");
 
 const Student = require("./models/student")
 const res = require("express/lib/response")
@@ -13,34 +14,35 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 require("./db/conn")
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 
 app.get("/", (req,res)=>{
     res.status(201).send("Welcome to Home Page")
 })
 
-app.post("/register",upload.single('image'), async(req,res)=>{
+app.post("/register", async(req,res)=>{
     try {
 
        const newStudent = new Student({
-            name: req.body.name,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
             email: req.body.email,
-            age:req.body.age,
-            city:req.body.city,
-            state:req.body.state,
-            country:req.body.country,
-            image:req.file.path,
+            // age:req.body.age,
+            // city:req.body.city,
+            // state:req.body.state,
+            // country:req.body.country,
+            // image:req.file.path,
             password: req.body.password,
         })
         const registered = await newStudent.save()
 
-        const token = await registered.generateAuthToken();
+        // const token = await registered.generateAuthToken();
         // console.log("the token part " + token)
 
-        res.cookie("jwt", token,{
-            expires : new Date(Date.now()+ 30000),
-            httpOnly: true
-        })
+        // res.cookie("jwt", token,{
+        //     expires : new Date(Date.now()+ 30000),
+        //     httpOnly: true
+        // })
 
         console.log(registered);
         res.status(201).send(registered)
@@ -53,9 +55,10 @@ app.post("/register",upload.single('image'), async(req,res)=>{
 
 app.post("/login", async (req,res)=>{
     try {
-        // const detail = req.body;
-        const verifyUser = await Student.find({email: req.body.email})
-        console.log(verifyUser);
+        const password = req.body.password;
+        // console.log(detail);
+        const verifyUser = await Student.findOne({email: req.body.email})
+        // console.log(verifyUser);
         // console.log(req.body.email);
         const token = await verifyUser.generateAuthToken();
         // console.log("the token part " + token)
@@ -66,21 +69,26 @@ app.post("/login", async (req,res)=>{
             // secure:true
         })
 
-        if(verifyUser.password === req.body.password){
-            res.status(200).send("Logged in sucessfully")
+        const isPasswordmatched = await bcrypt.compare(password, verifyUser.password)
+
+        if(isPasswordmatched){
+            // console.log("error");
+            res.send({
+                error: false,
+                error_code: 201,
+                message:"logged In",
+                results:req.body.email,
+              })
         }
         else{
             res.send("Wrong Password")
         }
     } catch (error) {
-        res.send(error)
+        res.send("Wrong Credenatials")
+        console.log(error);
     }
 })
 
-// app.post("/single", upload.single("singleImage"), (req, res) => {
-//     console.log(req.file);
-//     res.status(201).send("Upload Successful")
-// })
 
 app.listen(port,()=>{
     console.log("Server is started");
