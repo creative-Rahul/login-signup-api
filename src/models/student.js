@@ -1,33 +1,64 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+const validator = require("validator")
 
 const studentSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true
+        required: true,
+        min: 3,
+        validate(value) {
+            if (value.length < 3) {
+                throw new Error("Invalid Name")
+            }
+        }
     },
     lastName: {
         type: String,
-        required: true
+        required: true,
+        min: 3,
+        validate(value) {
+            if (value.length < 3) {
+                throw new Error("Invalid Name")
+            }
+        }
     },
     email: {
         type: String,
         required: true,
-        unique:true
+        unique: true,
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error("Invalid email")
+            }
+        }
     },
-    // age:{
-    //     type : Number,
-    //     required :true
-    // },
-    // city:{
-    //     type : String,
-    //     required :true
-    // },
-    // state:{
-    //     type : String,
-    //     required :true
-    // },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        validate(value) {
+            if (value.length < 5 || value.length > 15) {
+                throw new Error("username should more than 5 and less than 15 characters")
+            }
+        }
+    },
+    link:{
+        type : String,
+        required :true
+    },
+    dob:{
+        type : Date,
+        required :true,
+        // validate(value){
+        //     value.format("dd/mm/yyyy")
+        // }
+    },
+    skills:{
+        type : String,
+        required :true
+    },
     // country:{
     //     type : String,
     //     required :true
@@ -40,12 +71,12 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
-    }]
+    // tokens: [{
+    //     token: {
+    //         type: String,
+    //         required: true
+    //     }
+    // }]
 })
 
 
@@ -64,13 +95,15 @@ studentSchema.methods.generateAuthToken = async function () {
 }
 
 
-studentSchema.pre("save", async function(next){
-    if(this.isModified("password")){
-        this.password = await bcrypt.hash(this.password,4)
-        console.log(`Hashed password ${this.password}`);
+studentSchema.pre("save", async function (next) {
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 4)
+        // console.log(`Hashed password ${this.password}`);
     }
     next()
 })
+
+
 
 
 
