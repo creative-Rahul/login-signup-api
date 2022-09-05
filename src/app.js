@@ -2,17 +2,20 @@ const express = require("express")
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
 const bcrypt = require("bcrypt");
+const bodyParser = require("body-parser")
 
 const Student = require("./models/student")
 const res = require("express/lib/response")
 const upload = require("./middleware/upload")
+require("./db/conn")
 
 
 const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
-require("./db/conn")
+// app.use(bodyParser.json())
 
 const port = process.env.PORT || 8000;
 
@@ -30,7 +33,6 @@ app.post("/register", async (req, res) => {
             link: req.body.link,
             dob: req.body.dob,
             skills:req.body.skills,
-            // country:req.body.country,
             // image:req.file.path,
             password: req.body.password,
         })
@@ -67,23 +69,23 @@ app.post("/register", async (req, res) => {
 
 
 
-app.post("/login", async (req, res) => {
+app.post("/login",async (req, res) => {
     try {
         const password = req.body.password;
         // console.log(detail);
         const verifyUser = await Student.findOne({ email: req.body.email })
         // console.log(verifyUser);
         // console.log(req.body.email);
-        const token = await verifyUser.generateAuthToken();
-        // console.log("the token part " + token)
+        // const token = await verifyUser.generateAuthToken();
+        // // console.log("the token part " + token)
 
-        res.cookie("jwt", token, {
-            expires: new Date(Date.now() + (3 * 60000)),
-            httpOnly: true,
-            // secure:true
-        })
+        // res.cookie("jwt", token, {
+        //     expires: new Date(Date.now() + (3 * 60000)),
+        //     httpOnly: true,
+        //     // secure:true
+        // })
 
-        const isPasswordmatched = await bcrypt.compare(password, verifyUser.password)
+        const isPasswordmatched = await bcrypt.compare(req.body.password, verifyUser.password)
 
         if (isPasswordmatched) {
             // console.log("error");

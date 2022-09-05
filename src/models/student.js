@@ -55,21 +55,18 @@ const studentSchema = new mongoose.Schema({
         //     value.format("dd/mm/yyyy")
         // }
     },
-    skills:{
+    skills:[{
         type : String,
         required :true
-    },
-    // country:{
-    //     type : String,
-    //     required :true
-    // },
+    }],
     // image:{
     //     type:String,
     //     required:true
     // },
     password: {
         type: String,
-        required: true
+        required: true,
+        
     },
     // tokens: [{
     //     token: {
