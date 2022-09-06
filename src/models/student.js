@@ -49,11 +49,11 @@ const studentSchema = new mongoose.Schema({
         required :true
     },
     dob:{
-        type : Date,
+        type : String,
         required :true,
-        // validate(value){
-        //     value.format("dd/mm/yyyy")
-        // }
+        validate(value){
+            validator.isDate(value,new Date(this.getDay+this.getMonth+this.getFullYear))
+        }
     },
     skills:[{
         type : String,
@@ -72,12 +72,6 @@ const studentSchema = new mongoose.Schema({
         required: true,
         
     },
-    // tokens: [{
-    //     token: {
-    //         type: String,
-    //         required: true
-    //     }
-    // }]
 })
 
 
