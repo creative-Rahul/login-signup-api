@@ -7,6 +7,8 @@ const cors = require("cors")
 const res = require("express/lib/response")
 const hbs = require("hbs")
 const path = require("path")
+const compression = require("compression")
+const multer = require("multer")
 
 const app = express()
 
@@ -31,7 +33,8 @@ hbs.registerPartials(partial_path);
 
 app.use(express.json());
 app.use(cors())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
+app.use(compression())
 // app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
@@ -46,9 +49,9 @@ app.get("/register", (req, res) => {
     res.status(201).render("register")
 })
 
-app.post("/register", upload.single("image"), async (req, res) => {
+app.post("/register", upload.any(), async (req, res) => {
     try {
-        // console.log(req.body);
+        console.log(req.file);
         const newStudent = new Student({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
