@@ -59,6 +59,10 @@ const studentSchema = new mongoose.Schema({
         type : String,
         required :true
     }],
+    education:[{
+        type : String,
+        required :true
+    }],
     // image:{
     //     type:String,
     //     required:true
