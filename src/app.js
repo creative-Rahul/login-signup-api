@@ -49,7 +49,7 @@ app.get("/register", (req, res) => {
     res.status(201).render("register")
 })
 
-app.post("/register",  async (req, res) => {
+app.post("/register", upload.single("image"), async (req, res) => {
     try {
         // console.log(req.files);
         const newStudent = new Student({
@@ -61,7 +61,7 @@ app.post("/register",  async (req, res) => {
             dob: req.body.dob,
             skills: req.body.skills,
             education: req.body.education,
-            // image: req.file.path,
+            image: req.file.path,
             password: req.body.password,
         })
 
